@@ -1382,6 +1382,20 @@
 
         <button id="buyBtn" class="action-btn" disabled>Connect Wallet to Buy</button>
 
+        <!-- REFERRAL LINK DISPLAY -->
+        <div id="referralContainer"
+            style="display:none; margin-top:20px; padding-top:16px; border-top:1px dashed rgba(255,255,255,0.1);">
+            <label class="input-label" style="color:var(--ok);">Your Unique Referral Link</label>
+            <div class="input-group" style="padding:8px 12px; margin-bottom:8px;">
+                <input type="text" id="myRefLink" class="token-input" style="font-size:14px;" readonly
+                    value="Connect Wallet to see link">
+                <button class="btn btn-ghost" onclick="copyReferral()"
+                    style="padding:6px 10px; font-size:12px;">COPY</button>
+            </div>
+            <p class="muted" style="font-size:11px;">Share this link to earn 3-10% referral bonus based on current
+                stage.</p>
+        </div>
+
         <div class="wallet-status">
             <button id="connectWalletBtn" class="btn btn-ghost"
                 style="width:100%; border:1px solid var(--line);">Connect Wallet</button>
