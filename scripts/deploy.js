@@ -11,10 +11,23 @@ async function main() {
     console.log("NeuralyToken deployed to:", token.address);
 
     // 2. Deploy Presale
-    // Configuration
-    const usdtAddressTestnet = "0x337610d27c682E347C9cD60BD4b3b107C9d343DD"; // BSC Testnet USDT
+    let usdtAddress;
+
+    // Check Network
+    const network = hre.network.name;
+    if (network === "localhost" || network === "hardhat") {
+        console.log("Local Network detected. Deploying MockUSDT...");
+        const MockUSDT = await hre.ethers.getContractFactory("MockUSDT");
+        const mockUsdt = await MockUSDT.deploy();
+        await mockUsdt.deployed();
+        usdtAddress = mockUsdt.address;
+        console.log("MockUSDT deployed to:", usdtAddress);
+    } else {
+        usdtAddress = "0x337610d27c682E347C9cD60BD4b3b107C9d343DD"; // BSC Testnet USDT
+    }
+
     const Presale = await hre.ethers.getContractFactory("NeuralyPresale");
-    const presale = await Presale.deploy(token.address, usdtAddressTestnet, deployer.address);
+    const presale = await Presale.deploy(token.address, usdtAddress, deployer.address);
     await presale.deployed();
     console.log("NeuralyPresale deployed to:", presale.address);
 
