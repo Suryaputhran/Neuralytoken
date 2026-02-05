@@ -54,6 +54,7 @@
             font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
             line-height: 1.55;
             overflow-x: hidden;
+            width: 100%;
         }
 
         a {
@@ -214,6 +215,88 @@
             background: radial-gradient(900px 500px at 15% 10%, rgba(155, 92, 255, .14), transparent 60%),
                 radial-gradient(700px 450px at 85% 25%, rgba(111, 76, 255, .12), transparent 55%),
                 radial-gradient(800px 600px at 50% 100%, rgba(155, 92, 255, .08), transparent 60%);
+            animation: breathe 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes breathe {
+            0% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .hero-card {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 3D Asset Styling */
+        .hero-image {
+            position: absolute;
+            top: -100px;
+            right: -150px;
+            width: 800px;
+            height: 800px;
+            z-index: -1;
+            opacity: 0.6;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            animation: pulse-glow 8s infinite alternate;
+        }
+
+        .feature-icon-img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 16px;
+            filter: drop-shadow(0 0 20px rgba(155, 92, 255, 0.5));
+            transition: transform 0.3s ease;
+        }
+
+        .feature-icon-img:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                opacity: 0.4;
+                transform: scale(0.95) rotate(0deg);
+            }
+
+            100% {
+                opacity: 0.7;
+                transform: scale(1.05) rotate(2deg);
+            }
         }
 
         canvas#fluid {
@@ -260,17 +343,26 @@
 
         h1 {
             font-family: "Space Grotesk", Inter, sans-serif;
-            font-size: 44px;
+            font-size: 56px;
+            /* Larger */
             line-height: 1.05;
             margin: 16px 0 14px;
-            letter-spacing: .2px;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 30%, #a277ff 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(155, 92, 255, 0.3);
+            position: relative;
         }
 
         .lead {
             color: var(--muted);
-            font-size: 16px;
-            margin: 0 0 18px;
+            font-size: 18px;
+            /* Larger */
+            margin: 0 0 24px;
             max-width: 56ch;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .bullets {
@@ -554,40 +646,93 @@
         @media (max-width: 920px) {
             .hero-wrap {
                 grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+
+            .hero-image {
+                position: relative;
+                top: auto;
+                right: auto;
+                width: 100%;
+                max-width: 500px;
+                height: auto;
+                margin: 0 auto;
+                display: block;
+                /* No negative order needed if we want it on top, but DOM order is image first. */
             }
 
             h1 {
-                font-size: 40px
+                font-size: 42px;
+            }
+
+            .lead {
+                margin: 0 auto 24px;
+            }
+
+            .bullets {
+                max-width: 600px;
+                margin: 18px auto 22px;
+                text-align: left;
+            }
+
+            .hero-card {
+                max-width: 500px;
+                margin: 0 auto;
             }
         }
 
         @media (max-width: 640px) {
             .bullets {
-                grid-template-columns: 1fr
+                grid-template-columns: 1fr;
             }
 
             .three {
-                grid-template-columns: 1fr
+                grid-template-columns: 1fr;
             }
 
             .two {
-                grid-template-columns: 1fr
+                grid-template-columns: 1fr;
             }
 
             h1 {
-                font-size: 34px
+                font-size: 34px;
             }
 
             .cta {
                 flex-direction: column;
-                align-items: flex-start
+                align-items: flex-start;
             }
 
             nav ul {
-                display: none
+                display: none;
             }
 
-            /* keep simple for MVP */
+            /* Mobile Specific Visual Tweaks */
+            .hero-image {
+                max-width: 280px;
+                top: -20px;
+                /* Slight adjust */
+            }
+
+            .feature-icon-img {
+                width: 80px;
+                height: 80px;
+            }
+
+            .abstract-shape {
+                opacity: 0.2;
+                /* Fade background shapes more on mobile */
+                transform: scale(0.6);
+            }
+
+            .shape-1 {
+                left: -150px;
+            }
+
+            .shape-2 {
+                right: -100px;
+            }
         }
 
         /* Smooth scroll */
@@ -637,14 +782,15 @@
                     Anonymous Founder</span>
 
                 <div class="hero-wrap" style="margin-top:18px">
+                    <img src="assets/hero-brain.png" alt="Neural Network Brain" class="hero-image reveal">
                     <div>
-                        <h1>High-Yield AI.<br />Ruthless Efficiency.</h1>
+                        <h1 class="reveal">High-Yield AI.<br />Ruthless Efficiency.</h1>
                         <p class="lead">
                             An AI-driven revenue protocol distributing performance-based rewards to token stakers on a
                             monthly basis.
                         </p>
 
-                        <div class="bullets">
+                        <div class="bullets reveal">
                             <div class="bullet">
                                 <div class="ic">⚡</div>
                                 <div>
@@ -858,76 +1004,90 @@
                             Token holders may vote on strategy risk parameters and protocol expansion decisions.
                         </div>
                     </div>
+                    <section id="tokenomics">
+                        <div class="container">
+                            <div class="section-head centered">
+                                <h2>Tokenomics</h2>
+                                <span class="badge">1,000,000,000 Supply</span>
+                            </div>
 
-                    <div class="card">
-                        <h3 style="margin:0 0 10px; font-family:'Space Grotesk', Inter, sans-serif;">Tokenomics</h3>
-                        <div class="muted2" style="margin-bottom:10px; font-size:12px;">
-                            Total Supply: <b style="color:var(--text)">100,000,000 NEURALY</b>
+                            <!-- Single Column Layout for Table -->
+                            <div style="max-width: 800px; margin: 0 auto;">
+                                <div class="card reveal">
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Allocation</th>
+                                                <th>%</th>
+                                                <th>Tokens</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>Presale</strong></td>
+                                                <td>35%</td>
+                                                <td>350,000,000</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Liquidity (Locked)</strong></td>
+                                                <td>20%</td>
+                                                <td>200,000,000</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Staking Rewards</strong></td>
+                                                <td>20%</td>
+                                                <td>200,000,000</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Team (Vested)</strong></td>
+                                                <td>15%</td>
+                                                <td>150,000,000</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Marketing/Dev</strong></td>
+                                                <td>10%</td>
+                                                <td>100,000,000</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
 
-                        <table aria-label="Tokenomics table">
-                            <thead>
-                                <tr>
-                                    <th>Allocation</th>
-                                    <th>Percentage</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Presale</strong></td>
-                                    <td>35%</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Liquidity (Locked)</strong></td>
-                                    <td>20%</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>AI Treasury</strong></td>
-                                    <td>15%</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Team (Time-Locked)</strong></td>
-                                    <td>15%</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Marketing</strong></td>
-                                    <td>10%</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Community Rewards</strong></td>
-                                    <td>5%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+                        <!-- Abstract Background Element Removed -->
+                    </section>
+
+
+                    <!-- Abstract Background Element Removed -->
         </section>
 
         <section id="roadmap">
             <div class="container">
                 <div class="section-head">
-                    <div>
-                        <h2>Roadmap (first 90 days)</h2>
-                        <div class="muted">Execution-first milestones. No unnecessary promises.</div>
-                    </div>
+                    <h2>Roadmap</h2>
+                    <div class="muted">Execution timeline.</div>
                 </div>
 
                 <div class="three">
-                    <div class="card step">
-                        <b>Phase 1 — Launch</b>
-                        <p>Token deployment, presale & liquidity provisioning, staking contract live.</p>
+                    <div class="card reveal step">
+                        <div class="pill" style="margin-bottom:12px; border-color:var(--purple)">Phase 1 (Current)</div>
+                        <b>Foundation</b>
+                        <p>Contract Development<br>Security Audit<br>Community Building<br>Presale Launch</p>
                     </div>
-                    <div class="card step">
-                        <b>Phase 2 — Revenue activation</b>
-                        <p>AI strategies deployed, treasury operational, first performance reporting.</p>
+                    <div class="card reveal step">
+                        <div class="pill" style="margin-bottom:12px">Phase 2</div>
+                        <b>Launch</b>
+                        <p>PancakeSwap Listing<br>CoinGecko/CMC Listing<br>First Revenue Distro<br>Marketing Push</p>
                     </div>
-                    <div class="card step">
-                        <b>Phase 3 — Optimization</b>
-                        <p>Strategy refinement, buyback & burn activation, reporting cadence stabilization.</p>
+                    <div class="card reveal step">
+                        <div class="pill" style="margin-bottom:12px">Phase 3</div>
+                        <b>Expansion</b>
+                        <p>Advanced Strategies<br>DAO Governance<br>Cross-chain Bridge<br>Partnerships</p>
                     </div>
                 </div>
             </div>
+
+            <!-- Abstract Background Element Removed -->
         </section>
 
         <section id="risk">
@@ -1103,9 +1263,35 @@
         </div>
     </div>
 
+    <!-- Wallet Selection Modal -->
+    <div class="presale-overlay" id="walletSelectionOverlay">
+        <div class="presale-modal" style="max-width: 360px;">
+            <div class="modal-header">
+                <h2>Connect Wallet</h2>
+                <button class="close-btn" id="closeWalletModal">&times;</button>
+            </div>
+
+            <div class="wallet-grid">
+                <div class="wallet-option" onclick="selectWallet('metamask')">
+                    <div class="wallet-icon" style="background: #e2761b"></div>
+                    <span>MetaMask</span>
+                </div>
+                <div class="wallet-option" onclick="selectWallet('trust')">
+                    <div class="wallet-icon" style="background: #3375bb"></div>
+                    <span>Trust Wallet</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- existing script -->
-    <script src="fluid.js"></script>
-    <script src="presale.js"></script>
+    <script src="fluid.js?v=3"></script>
+    <script src="presale.js?v=2"></script>
+    <script src="scroll-reveal.js"></script>
+
+    <!-- Particles Effect -->
+    <link rel="stylesheet" href="particles.css">
+    <script src="particles.js"></script>
 </body>
 
 </html>

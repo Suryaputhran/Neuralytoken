@@ -11,9 +11,11 @@ let userAddress = null;
 
 // DOM Elements
 const presaleOverlay = document.getElementById('presaleOverlay');
+const walletSelectionOverlay = document.getElementById('walletSelectionOverlay');
 const connectBtn = document.getElementById('connectWalletBtn'); // In Modal
 const mainConnectBtn = document.getElementById('presaleLink'); // Global CTA
 const closeModalBtn = document.getElementById('closeModal');
+const closeWalletModalBtn = document.getElementById('closeWalletModal');
 const buyBtn = document.getElementById('buyBtn');
 const bnbInput = document.getElementById('bnbAmount');
 const tokenOutput = document.getElementById('tokenAmount');
@@ -24,34 +26,40 @@ const raisedDisplay = document.getElementById('raisedAmount');
 function initPresale() {
     updateProgress();
 
-    // Event Listeners
+    // Main Presale Modal Triggers
     mainConnectBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        openModal();
+        openModal(presaleOverlay);
     });
 
-    closeModalBtn.addEventListener('click', closeModal);
+    closeModalBtn.addEventListener('click', () => closeModal(presaleOverlay));
 
     // Close on click outside
     presaleOverlay.addEventListener('click', (e) => {
-        if (e.target === presaleOverlay) closeModal();
+        if (e.target === presaleOverlay) closeModal(presaleOverlay);
+    });
+
+    // Wallet Selection Triggers
+    connectBtn.addEventListener('click', () => openModal(walletSelectionOverlay));
+    closeWalletModalBtn.addEventListener('click', () => closeModal(walletSelectionOverlay));
+    walletSelectionOverlay.addEventListener('click', (e) => {
+        if (e.target === walletSelectionOverlay) closeModal(walletSelectionOverlay);
     });
 
     // Input calculation
     bnbInput.addEventListener('input', calculateTokens);
 
-    // Wallet Connection
-    connectBtn.addEventListener('click', connectWallet);
+    // Initial button state
     buyBtn.addEventListener('click', handleBuy);
 }
 
-function openModal() {
-    presaleOverlay.classList.add('active');
+function openModal(modal) {
+    modal.classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
-function closeModal() {
-    presaleOverlay.classList.remove('active');
+function closeModal(modal) {
+    modal.classList.remove('active');
     document.body.style.overflow = '';
 }
 
@@ -67,27 +75,53 @@ function updateProgress() {
     raisedDisplay.textContent = `${PRESALE_CONFIG.raised} / ${PRESALE_CONFIG.hardcap} BNB`;
 }
 
-async function connectWallet() {
-    if (typeof window.ethereum !== 'undefined') {
-        try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            userAddress = accounts[0];
-            onWalletConnected();
-        } catch (error) {
-            console.error(error);
-            alert('Connection Failed');
-        }
-    } else {
-        if (confirm("MetaMask is not installed. Would you like to download it now?")) {
-            window.open("https://metamask.io/download/", "_blank");
-        }
-    }
-}
+// Global scope for HTML onclick
+window.selectWallet = async function (type) {
+    closeModal(walletSelectionOverlay);
 
-function onWalletConnected() {
+    let provider;
+
+    try {
+        if (type === 'metamask') {
+            if (typeof window.ethereum !== 'undefined' && window.ethereum.isMetaMask) {
+                provider = window.ethereum;
+            } else {
+                if (confirm("MetaMask is not installed. Download now?")) {
+                    window.open("https://metamask.io/download/", "_blank");
+                }
+                return;
+            }
+        } else if (type === 'trust') {
+            // Priority: Trust Wallet object -> Ethereum object (if Trust overrides it)
+            if (window.trustwallet) {
+                provider = window.trustwallet;
+            } else if (typeof window.ethereum !== 'undefined' && window.ethereum.isTrust) {
+                provider = window.ethereum;
+            } else {
+                if (confirm("Trust Wallet is not installed. Download now?")) {
+                    window.open("https://trustwallet.com/browser-extension/", "_blank");
+                }
+                return;
+            }
+        }
+
+        if (provider) {
+            const accounts = await provider.request({ method: 'eth_requestAccounts' });
+            userAddress = accounts[0];
+            onWalletConnected(type);
+        }
+    } catch (error) {
+        console.error("Wallet connection error:", error);
+        alert('Connection Failed or Cancelled');
+    }
+};
+
+function onWalletConnected(type) {
     const shortAddr = `${userAddress.substring(0, 6)}...${userAddress.substring(38)}`;
-    connectBtn.textContent = shortAddr;
-    connectBtn.style.background = 'rgba(255,255,255,0.1)';
+    connectBtn.textContent = `${shortAddr} (${type === 'trust' ? 'Trust' : 'MetaMask'})`;
+    connectBtn.style.background = 'rgba(67, 255, 168, 0.1)';
+    connectBtn.style.borderColor = 'var(--ok)';
+    connectBtn.style.color = 'var(--ok)';
     buyBtn.disabled = false;
     buyBtn.textContent = "Buy NEURALY";
 }

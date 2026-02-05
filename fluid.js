@@ -609,8 +609,45 @@ function update() {
     updateColors(dt);
     applyInputs();
     if (!config.PAUSED) { step(dt); }
+    updateRandomSplats(dt); // New: Auto-generate activity
     render(null);
     requestAnimationFrame(update);
+}
+
+// New: Auto-splat configuration and logic
+var splatTimer = 0;
+function updateRandomSplats(dt) {
+    splatTimer += dt;
+    // Every 2-4 seconds (random)
+    if (splatTimer > Math.random() * 2 + 2) {
+        splatTimer = 0;
+        // Generate shallow splats (low force so it's ambient)
+        const x = Math.random();
+        const y = Math.random();
+        const dx = (Math.random() - 0.5) * 200;
+        const dy = (Math.random() - 0.5) * 200;
+        const color = generateColor();
+
+        splat(x, y, dx, dy, color);
+    }
+}
+
+function splat(x, y, dx, dy, color) {
+    gl.viewport(0, 0, velocity.width, velocity.height);
+    splatProgram.bind();
+    gl.uniform1i(splatProgram.uniforms.uTarget, velocity.read.attach(0));
+    gl.uniform1f(splatProgram.uniforms.aspectRatio, canvas.width / canvas.height);
+    gl.uniform2f(splatProgram.uniforms.point, x, y);
+    gl.uniform3f(splatProgram.uniforms.color, dx, dy, 0.0);
+    gl.uniform1f(splatProgram.uniforms.radius, config.SPLAT_RADIUS / 100.0);
+    blit(velocity.write.fbo);
+    velocity.swap();
+
+    gl.viewport(0, 0, dye.width, dye.height);
+    gl.uniform1i(splatProgram.uniforms.uTarget, dye.read.attach(0));
+    gl.uniform3f(splatProgram.uniforms.color, color.r, color.g, color.b);
+    blit(dye.write.fbo);
+    dye.swap();
 }
 
 function calcDeltaTime() {
