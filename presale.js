@@ -2,7 +2,7 @@
 const PRESALE_CONFIG = {
     hardcap: 500, // BNB
     raised: 154.5, // Mock initial value
-    rate: 2000000, // 1 BNB = 2,000,000 NEURALY
+    rate: 20000000, // 1 BNB = 20,000,000 NEURALY
     minBuy: 0.1,
     maxBuy: 10
 };
