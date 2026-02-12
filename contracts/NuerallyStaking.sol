@@ -7,16 +7,16 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
- * @title NeuralyStaking
- * @dev Fixed APY Staking for NEURALY Tokens.
- * - Stakers deposit NEURALY
+ * @title NuerallyStaking
+ * @dev Fixed APY Staking for NUERALLY Tokens.
+ * - Stakers deposit NUERALLY
  * - Earn 20% APY (Example fixed rate)
  * - Rewards paid from a dedicated Reward Pool
  */
-contract NeuralyStaking is Ownable, ReentrancyGuard {
+contract NuerallyStaking is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    IERC20 public neuralyToken;
+    IERC20 public nuerallyToken;
 
     // Defines the ratio of rewards per second per token staked
     // Example: 20% APY
@@ -39,7 +39,7 @@ contract NeuralyStaking is Ownable, ReentrancyGuard {
     event RewardsClaimed(address indexed user, uint256 rewards);
 
     constructor(address _token, address initialOwner) Ownable(initialOwner) {
-        neuralyToken = IERC20(_token);
+        nuerallyToken = IERC20(_token);
     }
 
     // --- Staking Logic ---
@@ -49,7 +49,7 @@ contract NeuralyStaking is Ownable, ReentrancyGuard {
         // Update existing rewards before adding new stake
         _updateRewards(msg.sender);
         
-        neuralyToken.safeTransferFrom(msg.sender, address(this), _amount);
+        nuerallyToken.safeTransferFrom(msg.sender, address(this), _amount);
         
         stakes[msg.sender].amount += _amount;
         totalStaked += _amount;
@@ -73,7 +73,7 @@ contract NeuralyStaking is Ownable, ReentrancyGuard {
         stakes[msg.sender].amount -= _amount;
         totalStaked -= _amount;
         
-        neuralyToken.safeTransfer(msg.sender, _amount);
+        nuerallyToken.safeTransfer(msg.sender, _amount);
         emit Withdrawn(msg.sender, _amount, rewards);
     }
     
@@ -110,12 +110,12 @@ contract NeuralyStaking is Ownable, ReentrancyGuard {
     }
     
     function _safeTokenTransfer(address _to, uint256 _amount) internal {
-        uint256 bal = neuralyToken.balanceOf(address(this));
+        uint256 bal = nuerallyToken.balanceOf(address(this));
         // Ensure we don't accidentally try to send more than exists (Reward Pool Limit)
         if (_amount > bal) {
-            neuralyToken.safeTransfer(_to, bal);
+            nuerallyToken.safeTransfer(_to, bal);
         } else {
-            neuralyToken.safeTransfer(_to, _amount);
+            nuerallyToken.safeTransfer(_to, _amount);
         }
     }
     

@@ -116,42 +116,6 @@
         "IERC20"
       ]
     },
-    "C:\\Users\\token\\Nuerally Token\\node_modules\\@openzeppelin\\contracts\\utils\\Context.sol": {
-      "lastModificationDate": 1770281968936,
-      "contentHash": "67bfbc07588eb8683b3fd8f6f909563e",
-      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
-      "solcConfig": {
-        "version": "0.8.20",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "Context"
-      ]
-    },
     "C:\\Users\\token\\Nuerally Token\\node_modules\\@openzeppelin\\contracts\\interfaces\\draft-IERC6093.sol": {
       "lastModificationDate": 1770281968966,
       "contentHash": "5041977bbe908de2e6ed0270447f79ad",
@@ -188,6 +152,42 @@
         "IERC1155Errors",
         "IERC20Errors",
         "IERC721Errors"
+      ]
+    },
+    "C:\\Users\\token\\Nuerally Token\\node_modules\\@openzeppelin\\contracts\\utils\\Context.sol": {
+      "lastModificationDate": 1770281968936,
+      "contentHash": "67bfbc07588eb8683b3fd8f6f909563e",
+      "sourceName": "@openzeppelin/contracts/utils/Context.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Context"
       ]
     },
     "C:\\Users\\token\\Nuerally Token\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol": {
@@ -305,10 +305,10 @@
         "Ownable"
       ]
     },
-    "C:\\Users\\token\\Nuerally Token\\contracts\\NeuralyVesting.sol": {
-      "lastModificationDate": 1770278506410,
-      "contentHash": "a04f898b7bcc7ee57efb72d2d109758a",
-      "sourceName": "contracts/NeuralyVesting.sol",
+    "C:\\Users\\token\\Nuerally Token\\contracts\\NuerallyVesting.sol": {
+      "lastModificationDate": 1770859360577,
+      "contentHash": "8e2c36e8282bbb0c62f60462647b009f",
+      "sourceName": "contracts/NuerallyVesting.sol",
       "solcConfig": {
         "version": "0.8.20",
         "settings": {
@@ -341,7 +341,7 @@
         "^0.8.20"
       ],
       "artifacts": [
-        "NeuralyVesting"
+        "NuerallyVesting"
       ]
     },
     "C:\\Users\\token\\Nuerally Token\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\utils\\SafeERC20.sol": {
@@ -530,10 +530,10 @@
         "IERC165"
       ]
     },
-    "C:\\Users\\token\\Nuerally Token\\contracts\\NeuralyStaking.sol": {
-      "lastModificationDate": 1770278666792,
-      "contentHash": "b938b9ede012b380f41adf180d44d1e6",
-      "sourceName": "contracts/NeuralyStaking.sol",
+    "C:\\Users\\token\\Nuerally Token\\contracts\\NuerallyStaking.sol": {
+      "lastModificationDate": 1770855327897,
+      "contentHash": "9612e84b58e292eb0450ffe6024db9e2",
+      "sourceName": "contracts/NuerallyStaking.sol",
       "solcConfig": {
         "version": "0.8.20",
         "settings": {
@@ -568,7 +568,7 @@
         "^0.8.20"
       ],
       "artifacts": [
-        "NeuralyStaking"
+        "NuerallyStaking"
       ]
     },
     "C:\\Users\\token\\Nuerally Token\\node_modules\\@openzeppelin\\contracts\\utils\\ReentrancyGuard.sol": {
@@ -607,10 +607,128 @@
         "ReentrancyGuard"
       ]
     },
-    "C:\\Users\\token\\Nuerally Token\\contracts\\NeuralyPresale.sol": {
-      "lastModificationDate": 1770282986393,
-      "contentHash": "4ce6c7711ac8eaee3f7b518d690219df",
-      "sourceName": "contracts/NeuralyPresale.sol",
+    "C:\\Users\\token\\Nuerally Token\\contracts\\NuerallyPresale.sol": {
+      "lastModificationDate": 1770860172131,
+      "contentHash": "53bc073bc3e9045c63e4f70dbe02b5f2",
+      "sourceName": "contracts/NuerallyPresale.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol",
+        "@openzeppelin/contracts/utils/ReentrancyGuard.sol",
+        "./interfaces/AggregatorV3Interface.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "NuerallyPresale"
+      ]
+    },
+    "C:\\Users\\token\\Nuerally Token\\contracts\\NuerallyToken.sol": {
+      "lastModificationDate": 1770860220407,
+      "contentHash": "0543be363dc66a18ca737f5bf673b745",
+      "sourceName": "contracts/NuerallyToken.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "NuerallyToken"
+      ]
+    },
+    "C:\\Users\\token\\Nuerally Token\\contracts\\interfaces\\AggregatorV3Interface.sol": {
+      "lastModificationDate": 1770860167995,
+      "contentHash": "3a50ac183d45c1b27a1fe480023c2733",
+      "sourceName": "contracts/interfaces/AggregatorV3Interface.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "AggregatorV3Interface"
+      ]
+    },
+    "C:\\Users\\token\\Nuerally Token\\contracts\\RevenueSharingStaking.sol": {
+      "lastModificationDate": 1770860115897,
+      "contentHash": "0fd0d89b85ef0d89c0517f31e25baee4",
+      "sourceName": "contracts/RevenueSharingStaking.sol",
       "solcConfig": {
         "version": "0.8.20",
         "settings": {
@@ -645,13 +763,13 @@
         "^0.8.20"
       ],
       "artifacts": [
-        "NeuralyPresale"
+        "RevenueSharingStaking"
       ]
     },
-    "C:\\Users\\token\\Nuerally Token\\contracts\\NeuralyToken.sol": {
-      "lastModificationDate": 1770278346709,
-      "contentHash": "fc1393536bdaa5dbc3143ebacfd5c620",
-      "sourceName": "contracts/NeuralyToken.sol",
+    "C:\\Users\\token\\Nuerally Token\\contracts\\MockAggregator.sol": {
+      "lastModificationDate": 1770860170006,
+      "contentHash": "f60d5258cd47ec990be63c0341c6d8d5",
+      "sourceName": "contracts/MockAggregator.sol",
       "solcConfig": {
         "version": "0.8.20",
         "settings": {
@@ -677,15 +795,13 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol",
-        "@openzeppelin/contracts/access/Ownable.sol"
+        "./interfaces/AggregatorV3Interface.sol"
       ],
       "versionPragmas": [
-        "^0.8.20"
+        "^0.8.0"
       ],
       "artifacts": [
-        "NeuralyToken"
+        "MockAggregator"
       ]
     }
   }

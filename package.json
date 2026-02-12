@@ -1,7 +1,7 @@
 {
-  "name": "neuraly-token-website",
+  "name": "nuerally-token-website",
   "version": "1.0.0",
-  "description": "NEURALY Token Landing Page",
+  "description": "NUERALLY Token Landing Page",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

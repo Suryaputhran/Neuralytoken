@@ -5,16 +5,17 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
- * @title NeuralyVesting
+ * @title NuerallyVesting
  * @dev Linear Vesting Contract for Team & Marketing Allocations.
  * - Tokens are released linearly over a duration.
  * - Optional "Cliff" (no tokens released before this time).
  * - Secure way to lock team tokens to build community trust.
  */
-contract NeuralyVesting is Ownable {
+contract NuerallyVesting is Ownable {
     using SafeERC20 for IERC20;
 
     event TokensReleased(address indexed token, uint256 amount);
+    event TokensBurned(uint256 amount);
 
     // Beneficiary of tokens after vesting
     address public immutable beneficiary;
@@ -52,7 +53,7 @@ contract NeuralyVesting is Ownable {
 
     /**
      * @dev Releases currently vested tokens to the beneficiary.
-     * @param token Address of the token (NEURALY).
+     * @param token Address of the token (NUERALLY).
      */
     function release(IERC20 token) external {
         uint256 unreleased = releasableAmount(token);
@@ -85,5 +86,21 @@ contract NeuralyVesting is Ownable {
             // Linear Vesting: (Total * (TimePassed)) / Duration
             return (totalAllocation * (timestamp - start)) / duration;
         }
+    }
+    // --- Burn Logic (Community Trust) ---
+    function burnRemainingTokens(IERC20 token) external onlyOwner {
+        uint256 balance = token.balanceOf(address(this));
+        require(balance > 0, "No tokens to burn");
+        
+        // Burn by sending to dead address (assuming token is not burnable via burn() function context)
+        // Or if token has burn(), we can use that. 
+        // NuerallyToken IS burnable (ERC20Burnable). Let's try to verify interface.
+        // For safety/generality, sending to dEaD is standard if interface unknown, 
+        // but since we know it is Nuerally, we can cast and burn or just transfer to dEaD.
+        // Transfer to dEaD is universally understood.
+        
+        token.safeTransfer(0x000000000000000000000000000000000000dEaD, balance);
+        
+        emit TokensBurned(balance);
     }
 }

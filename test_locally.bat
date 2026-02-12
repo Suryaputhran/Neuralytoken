@@ -1,5 +1,4 @@
 @echo off
-set PATH=C:\Program Files\nodejs;%PATH%
 echo Starting Local Blockchain...
 start "Hardhat Local Node" cmd /k "echo Copy a PRIVATE KEY from here to MetaMask! && npx hardhat node"
 echo.

@@ -1,4 +1,4 @@
-# How to run NEURALY Website
+# How to run NUERALLY Website
 
 Since you do not have Node.js or Python installed/configured in your PATH, you can view the website by opening the HTML file directly.
 

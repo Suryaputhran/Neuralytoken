@@ -3,8 +3,8 @@ const PRESALE_CONFIG = {
     hardcap: 500, // BNB
     raised: 154.5, // Mock initial value
     rates: {
-        BNB: 20000000,   // 1 BNB = 20,000,000 NEURALY
-        USDT: 50000      // 1 USDT = 50,000 NEURALY (Example Rate)
+        BNB: 20000000,   // 1 BNB = 20,000,000 NUERALLY
+        USDT: 50000      // 1 USDT = 50,000 NUERALLY (Example Rate)
     },
     limits: {
         BNB: { min: 0.1, max: 10 },
@@ -13,29 +13,53 @@ const PRESALE_CONFIG = {
 };
 
 // Web3 Config
-const WEB3_CONFIG = {
-    contractAddress: "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0", // Local Presale
-    usdtAddress: "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512",      // Mock USDT
-    chainId: 1337, // Hardhat Localhost
-    chainHex: "0x539",
-    rpcUrl: "http://127.0.0.1:8545/",
-    blockExplorer: "http://localhost",
-    abi: [
-        "function buyWithBNB(address referrer) public payable",
-        "function buyWithUSDT(uint256 amount, address referrer) public",
-        "function getCurrentPrice() public view returns (uint256)",
-        "function tokensSoldInCurrentStage() public view returns (uint256)",
-        "function currentStage() public view returns (uint256)",
-        "function totalRaisedBNB() public view returns (uint256)",
-        "function getReferralPercent() public view returns (uint256)",
-        "function STAGE_ALLOCATION() public view returns (uint256)"
-    ],
-    erc20Abi: [
-        "function approve(address spender, uint256 amount) public returns (bool)",
-        "function allowance(address owner, address spender) public view returns (uint256)",
-        "function balanceOf(address account) public view returns (uint256)"
-    ]
+// Web3 Config
+const ENV = "TESTNET"; // Change to "MAINNET" for production
+
+const VALID_CHAINS = {
+    MAINNET: 56,   // BNB Smart Chain
+    TESTNET: 97,   // BSC Testnet
+    LOCAL: 1337    // Hardhat
 };
+
+const CONFIG = {
+    MAINNET: {
+        contractAddress: "0xREPLACE_WITH_MAINNET_ADDRESS",
+        usdtAddress: "0x55d398326f99059fF775485246999027B3197955", // Binance-Peg BSC-USD
+        chainId: 56,
+        chainHex: "0x38",
+        rpcUrl: "https://bsc-dataseed.binance.org/",
+        blockExplorer: "https://bscscan.com"
+    },
+    TESTNET: {
+        contractAddress: "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318", // Keep local for now or update
+        usdtAddress: "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+        chainId: 1337, // Defaulting to Local for now to keep it working
+        chainHex: "0x539",
+        rpcUrl: "http://127.0.0.1:8545/",
+        blockExplorer: "http://localhost"
+    }
+};
+
+const WEB3_CONFIG = CONFIG[ENV];
+
+// Shared ABIs
+WEB3_CONFIG.abi = [
+    "function buyWithBNB(address referrer) public payable",
+    "function buyWithUSDT(uint256 amount, address referrer) public",
+    "function getCurrentPrice() public view returns (uint256)",
+    "function tokensSoldInCurrentStage() public view returns (uint256)",
+    "function currentStage() public view returns (uint256)",
+    "function totalRaisedBNB() public view returns (uint256)",
+    "function getReferralPercent() public view returns (uint256)",
+    "function STAGE_ALLOCATION() public view returns (uint256)"
+];
+
+WEB3_CONFIG.erc20Abi = [
+    "function approve(address spender, uint256 amount) public returns (bool)",
+    "function allowance(address owner, address spender) public view returns (uint256)",
+    "function balanceOf(address account) public view returns (uint256)"
+];
 
 let userAddress = null;
 let currentCurrency = 'BNB'; // 'BNB' or 'USDT'
@@ -101,6 +125,12 @@ function initPresale() {
     // Initial button state
     if (buyBtn) buyBtn.addEventListener('click', handleBuy);
 
+    // Add To Wallet Button
+    const addToWalletBtn = document.getElementById('addToWalletBtn');
+    if (addToWalletBtn) {
+        addToWalletBtn.addEventListener('click', addTokenToWallet);
+    }
+
     // Set initial Label
     updateCurrencyUI();
 
@@ -114,23 +144,39 @@ async function fetchRawData() {
         const contract = new ethers.Contract(WEB3_CONFIG.contractAddress, WEB3_CONFIG.abi, provider);
 
         // Fetch Data in bulk
-        const [stageIndex, tokensSold, allocation] = await Promise.all([
+        const [stageIndex, tokensSold, allocation, priceWei] = await Promise.all([
             contract.currentStage(),
             contract.tokensSoldInCurrentStage(),
-            contract.STAGE_ALLOCATION()
+            contract.STAGE_ALLOCATION(),
+            contract.getCurrentPrice()
         ]);
 
         // Helper to formatting
-        const soldFormatted = parseFloat(ethers.utils.formatEther(tokensSold));
-        const allocationFormatted = parseFloat(ethers.utils.formatEther(allocation));
+        const soldTokens = parseFloat(ethers.utils.formatEther(tokensSold));
+        const allocationTokens = parseFloat(ethers.utils.formatEther(allocation));
+        const price = parseFloat(ethers.utils.formatEther(priceWei));
 
-        PRESALE_CONFIG.raised = soldFormatted;
-        PRESALE_CONFIG.hardcap = allocationFormatted; // Reusing hardcap var for Stage Allocation
+        PRESALE_CONFIG.raised = soldTokens;
+        PRESALE_CONFIG.hardcap = allocationTokens;
+        PRESALE_CONFIG.price = price; // Store price
 
         // Update UI
         const currentStageNum = parseInt(stageIndex) + 1;
-        const headerTitle = document.querySelector('.modal-header h2');
-        if (headerTitle) headerTitle.textContent = `Presale Access (Stage ${currentStageNum})`;
+        const headerTitle = document.querySelector('.modal-header h2'); // Target the h2 inside modal-header
+
+        // If modal header exists (it's inside .presale-modal)
+        if (headerTitle) {
+            headerTitle.textContent = `Stage ${currentStageNum} Presale`;
+        } else {
+            // Fallback if structure is different
+            console.log("Header not found");
+        }
+
+        // Also find the "Presale Access" text if it's different in HTML
+        // Looking at HTML: <div class="modal-header"> ... <button ...>Connect Wallet</button> ... </div>
+        // Wait, the HTML shown in view_file for index.html (lines 1362-1371) DOES NOT HAVE AN H2 in modal-header!
+        // It has buttons.
+        // I need to ADD the Stage info to the UI.
 
         updateProgress();
 
@@ -139,20 +185,7 @@ async function fetchRawData() {
     }
 }
 
-function updateProgress() {
-    const sold = PRESALE_CONFIG.raised;
-    const target = PRESALE_CONFIG.hardcap;
 
-    const percentage = (sold / target) * 100;
-
-    if (progressBar) progressBar.style.width = `${percentage}%`;
-
-    // Format large numbers with commas
-    const soldStr = sold.toLocaleString('en-US', { maximumFractionDigits: 0 });
-    const targetStr = target.toLocaleString('en-US', { maximumFractionDigits: 0 });
-
-    if (raisedDisplay) raisedDisplay.textContent = `${soldStr} / ${targetStr} NEURALY`;
-}
 
 // Web3 Config
 // Global scope for HTML onclick
@@ -275,7 +308,7 @@ async function checkUSDTAllowance() {
     // Logic placeholder for UI update
     // In real app, we query allowance
     buyBtn.textContent = "Approve USDT";
-    // If allowance > 0, set to "Buy NEURALY"
+    // If allowance > 0, set to "Buy NUERALLY"
 }
 
 async function handleBuy() {
@@ -303,37 +336,18 @@ async function handleBuy() {
         if (currentCurrency === 'USDT' && buyBtn.textContent.includes("Approve")) {
             buyBtn.textContent = 'Approving...';
 
-            if (WEB3_CONFIG.contractAddress.includes("0x000")) {
-                await new Promise(r => setTimeout(r, 1500));
-                alert("DEMO: USDT Approved!");
-                buyBtn.textContent = "Buy NEURALY";
-                buyBtn.disabled = false;
-                return;
-            }
-
             // Real Approval Logic
             const usdtContract = new ethers.Contract(WEB3_CONFIG.usdtAddress, WEB3_CONFIG.erc20Abi, signer);
             const tx = await usdtContract.approve(WEB3_CONFIG.contractAddress, ethers.constants.MaxUint256);
             await tx.wait();
 
-            buyBtn.textContent = "Buy NEURALY";
+            buyBtn.textContent = "Buy NUERALLY";
             buyBtn.disabled = false;
             return;
         }
 
         // BUY LOGIC
         buyBtn.textContent = 'Processing...';
-
-        // Demo Check
-        if (WEB3_CONFIG.contractAddress.includes("0x000")) {
-            await new Promise(r => setTimeout(r, 2000));
-            alert(`DEMO: Successfully bought with ${amount} ${currentCurrency}!`);
-            PRESALE_CONFIG.raised += (currentCurrency === 'BNB' ? amountFloat : 0); // Only track BNB for demo bar
-            updateProgress();
-            buyBtn.textContent = 'Buy NEURALY';
-            buyBtn.disabled = false;
-            return;
-        }
 
         const contract = new ethers.Contract(WEB3_CONFIG.contractAddress, WEB3_CONFIG.abi, signer);
         let tx;
@@ -383,7 +397,7 @@ async function handleBuy() {
 
     } finally {
         if (!buyBtn.textContent.includes("Approve")) {
-            buyBtn.textContent = 'Buy NEURALY';
+            buyBtn.textContent = 'Buy NUERALLY';
             buyBtn.disabled = false;
         }
     }
@@ -431,39 +445,126 @@ window.toggleCurrency = function (currency) {
 
     // Trigger UI Update for Button State
     updateCurrencyUI();
+    updateProgress(); // Refresh progress text (USDT vs BNB)
 };
 
 function updateCurrencyUI() {
     if (currentCurrency === 'USDT') {
+        // Change button to "Approve USDT" initially, then check allowance
+        if (buyBtn) buyBtn.textContent = 'Approve USDT';
         checkUSDTAllowance();
     } else {
         // BNB Logic
         if (buyBtn) {
-            buyBtn.textContent = 'Buy NEURALY';
-            // Only disable if wallet not connected? 
-            // Actually handleBuy checks wallet. 
-            // Just ensure it doesn't say "Approve"
+            buyBtn.textContent = 'Buy NUERALLY';
+            buyBtn.disabled = false;
         }
     }
 }
 
-function calculateTokens() {
-    if (!paymentInput || !tokenOutput) return;
+function updateProgress() {
+    console.log("Updating progress...");
+    const sold = PRESALE_CONFIG.raised;
+    const target = PRESALE_CONFIG.hardcap;
+    const price = PRESALE_CONFIG.price || 0.00012;
 
-    const amount = parseFloat(paymentInput.value);
-    if (isNaN(amount)) {
-        tokenOutput.value = '';
-        return;
+    console.log("Values:", { sold, target, price, currentCurrency });
+
+    console.log("Values:", { sold, target, price, currentCurrency });
+
+    const percentage = target > 0 ? (sold / target) * 100 : 0;
+
+    if (progressBar) progressBar.style.width = `${percentage}%`;
+
+    // Calculate BNB (Assuming 1 BNB = $600 as per contract demo logic)
+    const BNB_PRICE = 600;
+
+    // In our config, 'raised' and 'hardcap' are in Tokens.
+    const raisedUSD = sold * price;
+    const targetUSD = target * price;
+
+    let displayStr = "";
+
+    if (currentCurrency === 'USDT') {
+        const raisedStr = raisedUSD.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        const targetStr = targetUSD.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        displayStr = `${raisedStr} / ${targetStr}`;
+    } else {
+        const raisedBNB = raisedUSD / BNB_PRICE;
+        const targetBNB = targetUSD / BNB_PRICE;
+
+        const raisedStr = raisedBNB.toLocaleString('en-US', { maximumFractionDigits: 2 });
+        const targetStr = targetBNB.toLocaleString('en-US', { maximumFractionDigits: 2 });
+        displayStr = `${raisedStr} BNB / ${targetStr} BNB`;
     }
 
-    const rate = PRESALE_CONFIG.rates[currentCurrency];
-    const tokens = amount * rate;
+    if (raisedDisplay) raisedDisplay.textContent = displayStr;
 
-    // Format with commas
-    tokenOutput.value = tokens.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    // Update the bottom status text with USDT values always (as per request)
+    // "display in that container target of stage 1 in USDT and how much target has been achieved till now"
+    const stageStatusText = document.getElementById('stageStatusText');
+    if (stageStatusText) {
+        const rStr = raisedUSD.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        const tStr = targetUSD.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        stageStatusText.textContent = `Raised: ${rStr} / Target: ${tStr}`;
+    }
 }
 
 // -------------------------------------------------------------
+
+// -------------------------------------------------------------
+// AI DEMO LOGIC
+// -------------------------------------------------------------
+async function generateAIImage() {
+    const promptInput = document.getElementById('aiPrompt');
+    const generateBtn = document.getElementById('generateBtn');
+    const aiImage = document.getElementById('aiImage');
+    const aiPlaceholder = document.getElementById('aiPlaceholder');
+    const aiLoader = document.getElementById('aiLoader');
+
+    const prompt = promptInput.value.trim();
+    if (!prompt) {
+        alert("Please enter a description first!");
+        return;
+    }
+
+    // UI Loading State
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = "<span>⏳ Processing...</span>";
+    aiImage.style.display = 'none';
+    aiPlaceholder.style.display = 'none';
+    aiLoader.style.display = 'flex';
+
+    try {
+        // Use Pollinations.ai (Free public API, no key needed)
+        // We add a random seed to ensure new images
+        const randomSeed = Math.floor(Math.random() * 100000);
+        const encodedPrompt = encodeURIComponent(prompt);
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=500&seed=${randomSeed}&nologo=true`;
+
+        // Preload image to avoid flicker
+        const img = new Image();
+        img.onload = () => {
+            aiImage.src = imageUrl;
+            aiImage.style.display = 'block';
+            aiLoader.style.display = 'none';
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = "<span>✨ Generate Again</span>";
+        };
+        img.onerror = () => {
+            throw new Error("Failed to load image");
+        };
+        img.src = imageUrl;
+
+    } catch (error) {
+        console.error("AI Generation Error:", error);
+        aiLoader.style.display = 'none';
+        aiPlaceholder.style.display = 'block';
+        aiPlaceholder.textContent = "Error: GPU Node busy. Please try again.";
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = "<span>✨ Generate</span>";
+    }
+}
 
 // Auto-init if script loaded
 document.addEventListener('DOMContentLoaded', initPresale);

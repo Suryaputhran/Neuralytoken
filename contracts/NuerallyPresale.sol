@@ -5,20 +5,26 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "./interfaces/AggregatorV3Interface.sol";
 
 /**
- * @title NeuralyPresale
+ * @title NuerallyPresale
  * @dev 10-Stage Dynamic Presale with Referral System and Vesting.
  */
-contract NeuralyPresale is Ownable, ReentrancyGuard {
+contract NuerallyPresale is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
     
     // --- Configuration ---
     IERC20 public token;
     IERC20 public usdt;
+    AggregatorV3Interface public priceFeed; // Chainlink Oracle
     
     uint256 public constant STAGE_ALLOCATION = 350_000_000 * 1e18; // 350M Tokens per stage
     uint256 public constant MIN_BUY_USD = 10 * 1e18; // $10 Minimum
+    uint256 public constant STAGE_DURATION = 10 days; 
+
+    // --- State ---
+    uint256 public stageStartTime;
     
     // --- State ---
     uint256 public currentStage;
@@ -54,9 +60,12 @@ contract NeuralyPresale is Ownable, ReentrancyGuard {
     event ReferralPaid(address indexed referrer, address indexed buyer, uint256 amount, uint256 stage);
     event StageChanged(uint256 newStage);
 
-    constructor(address _token, address _usdt, address initialOwner) Ownable(initialOwner) {
+    constructor(address _token, address _usdt, address initialOwner, address _marketingWallet, address _priceFeed) Ownable(initialOwner) {
         token = IERC20(_token);
         usdt = IERC20(_usdt);
+        marketingWallet = _marketingWallet;
+        stageStartTime = block.timestamp;
+        priceFeed = AggregatorV3Interface(_priceFeed);
     }
 
     // --- Prices ---
@@ -91,12 +100,17 @@ contract NeuralyPresale is Ownable, ReentrancyGuard {
         emit TokensPurchased(msg.sender, tokenAmount, usdtAmount, "USDT");
     }
 
+    function getLatestPrice() public view returns (uint256) {
+        (, int256 price, , , ) = priceFeed.latestRoundData();
+        // Chainlink returns 8 decimals for USD pairs (e.g. 30000000000 = $300)
+        // We want 18 decimals.
+        return uint256(price) * 1e10; 
+    }
+
     function buyWithBNB(address _referrer) external payable nonReentrant {
         require(presaleActive, "Presale ended");
         
-        // Oracle Rate Simulation (1 BNB = $600 for demo logic)
-        // In prod, use Chainlink Oracle
-        uint256 bnbPriceInUsd = 600 * 1e18; 
+        uint256 bnbPriceInUsd = getLatestPrice(); 
         uint256 usdValue = (msg.value * bnbPriceInUsd) / 1e18;
         
         require(usdValue >= MIN_BUY_USD, "Below Minimum Buy");
@@ -110,16 +124,32 @@ contract NeuralyPresale is Ownable, ReentrancyGuard {
         emit TokensPurchased(msg.sender, tokenAmount, msg.value, "BNB");
     }
 
+    // --- Buying Logic ---
+    // ... (unchanged buy functions) ...
+
     function _processPurchase(address buyer, uint256 amount, address _referrer) internal {
-        // Stage Management
-        if (tokensSoldInCurrentStage + amount > STAGE_ALLOCATION) {
-             uint256 remainder = (tokensSoldInCurrentStage + amount) - STAGE_ALLOCATION;
-             tokensSoldInCurrentStage = remainder;
+        // Stage Management (Time & Volume)
+        bool timeExpired = block.timestamp > stageStartTime + STAGE_DURATION;
+        bool volumeSoldOut = tokensSoldInCurrentStage + amount > STAGE_ALLOCATION;
+
+        if (volumeSoldOut || timeExpired) {
+             // If volume sold out, take remainder for next stage calculate? 
+             // Simplification: If time expired, jump to next stage immediately with 0 sold
+             // If volume sold, jump.
+             
+             if (volumeSoldOut) {
+                 uint256 remainder = (tokensSoldInCurrentStage + amount) - STAGE_ALLOCATION;
+                 tokensSoldInCurrentStage = remainder;
+             } else {
+                 tokensSoldInCurrentStage = 0; // Reset for new stage if time expired
+             }
+             
              if(currentStage < 9) {
                  currentStage++;
+                 stageStartTime = block.timestamp; // Reset Timer
                  emit StageChanged(currentStage);
              } else {
-                 presaleActive = false; // Sold Out
+                 presaleActive = false; // Sold Out or End of Stage 10
              }
         } else {
             tokensSoldInCurrentStage += amount;
@@ -137,6 +167,13 @@ contract NeuralyPresale is Ownable, ReentrancyGuard {
             referralEarnings[_referrer] += bonus;
             emit ReferralPaid(_referrer, buyer, bonus, currentStage);
         }
+    }
+
+    // --- Launchpad Allocation ---
+    function withdrawUnsoldToLaunchpad(address launchpadWallet) external onlyOwner {
+        require(!presaleActive, "Presale still active");
+        uint256 balance = token.balanceOf(address(this));
+        token.safeTransfer(launchpadWallet, balance);
     }
     
     // --- Claiming (Locked) ---
@@ -167,7 +204,10 @@ contract NeuralyPresale is Ownable, ReentrancyGuard {
         require(amount > 0, "No rewards");
         
         referralEarnings[msg.sender] = 0;
-        token.safeTransfer(msg.sender, amount);
+        
+        // Pay from Marketing Wallet (Must be approved)
+        require(marketingWallet != address(0), "Marketing Wallet not set");
+        token.safeTransferFrom(marketingWallet, msg.sender, amount);
     }
     
     // --- Admin ---
@@ -178,5 +218,12 @@ contract NeuralyPresale is Ownable, ReentrancyGuard {
     
     function setLaunchTime(uint256 _time) external onlyOwner {
         launchTime = _time;
+    }
+    
+    // --- Marketing Wallet for Referrals ---
+    address public marketingWallet;
+    
+    function setMarketingWallet(address _wallet) external onlyOwner {
+        marketingWallet = _wallet;
     }
 }
