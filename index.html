@@ -1133,87 +1133,129 @@
             </div>
         </section>
 
-        <!-- LIVE AI DEMO SECTION -->
-        <section id="ai-demo"
-            style="background: linear-gradient(180deg, var(--bg) 0%, rgba(155,92,255,0.05) 50%, var(--bg) 100%);">
+        <!-- AGENT TERMINAL SECTION -->
+        <section id="agent-terminal-section"
+            style="background: #050505; border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a; padding: 60px 0;">
             <div class="container">
-                <div class="section-head" style="text-align: center; flex-direction: column; align-items: center;">
+                <div class="section-head" style="text-align: center; margin-bottom: 40px;">
                     <div class="pill">
                         <span class="dot" style="background: var(--ok); box-shadow: 0 0 10px var(--ok);"></span>
-                        <span>Live GPU Network</span>
+                        <span>Live Network Activity</span>
                     </div>
-                    <h2 style="font-size: 36px; margin-top: 10px;">Experience Nuerally Compute</h2>
-                    <p class="lead" style="margin: 0 auto; max-width: 600px;">
-                        Generate AI art instantly using our decentralized GPU network.
-                        Prove the utility before you buy.
-                    </p>
+                    <h2>Autonomous Agent Negotiation</h2>
+                    <p class="muted">Real-time simulation of protocol revenue generation strategies.</p>
                 </div>
 
-                <div class="card"
-                    style="max-width: 800px; margin: 0 auto; padding: 30px; border: 1px solid rgba(155, 92, 255, 0.3);">
-                    <div style="display: flex; gap: 14px; flex-wrap: wrap;">
-                        <input type="text" id="aiPrompt"
-                            placeholder="Describe an image (e.g. 'Cyberpunk City with Neon Lights')..."
-                            style="flex: 1; min-width: 280px; padding: 14px; border-radius: 12px; border: 1px solid var(--line); background: rgba(0,0,0,0.3); color: #fff; font-family: Inter;">
-                        <button id="generateBtn" class="btn btn-primary" onclick="generateAIImage()">
-                            <span>✨ Generate</span>
-                        </button>
+                <div class="terminal-window" style="
+                    background: rgba(10, 10, 12, 0.9); 
+                    border: 1px solid rgba(155, 92, 255, 0.2); 
+                    border-radius: 8px; 
+                    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+                    max-width: 800px;
+                    margin: 0 auto;
+                    font-family: 'Consolas', 'Monaco', monospace;
+                    overflow: hidden;
+                ">
+                    <!-- Title Bar -->
+                    <div class="term-header" style="
+                        background: rgba(255, 255, 255, 0.05);
+                        padding: 8px 12px;
+                        display: flex;
+                        align-items: center;
+                        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    ">
+                        <div style="display: flex; gap: 6px; margin-right: 12px;">
+                            <div style="width: 10px; height: 10px; border-radius: 50%; background: #ff5f56;"></div>
+                            <div style="width: 10px; height: 10px; border-radius: 50%; background: #ffbd2e;"></div>
+                            <div style="width: 10px; height: 10px; border-radius: 50%; background: #27c93f;"></div>
+                        </div>
+                        <div style="font-size: 12px; color: #888;">nuerally_agent_core_v1.exe</div>
                     </div>
 
-                    <div id="aiResult"
-                        style="margin-top: 24px; min-height: 300px; border-radius: 12px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; border: 1px dashed var(--line);">
-                        <p class="muted" id="aiPlaceholder">Enter a prompt to start GPU Node #42...</p>
-                        <img id="aiImage" src="" alt="Generated Art"
-                            style="display: none; width: 100%; height: auto; object-fit: cover;">
-                        <div id="aiLoader" style="display: none; flex-direction: column; align-items: center;">
-                            <div class="spinner"
-                                style="width: 30px; height: 30px; border: 3px solid rgba(155,92,255,0.3); border-top-color: var(--purple); border-radius: 50%; animation: spin 1s linear infinite;">
-                            </div>
-                            <p style="margin-top: 10px; font-size: 12px; color: var(--purple);">Processing on Node
-                                #42...</p>
-                        </div>
+                    <!-- Output Area -->
+                    <div id="terminal-output" style="
+                        height: 300px;
+                        padding: 16px;
+                        overflow-y: hidden; /* Auto scroll handles logic */
+                        color: #ddd;
+                        font-size: 13px;
+                        line-height: 1.6;
+                    ">
+                        <!-- JS Simulation will inject here -->
+                        <div style="color: #666; margin-bottom: 10px;">> Initializing secure connection to Agent
+                            Swarm...</div>
                     </div>
-                    <p class="muted" style="text-align: center; font-size: 11px; margin-top: 12px;">
-                        Powered by Nuerally Distributed GPU Network
-                    </p>
+
+                    <!-- Input Simulation (Visual only) -->
+                    <div style="
+                        padding: 10px 16px; 
+                        border-top: 1px solid rgba(255,255,255,0.05);
+                        color: var(--ok);
+                        font-size: 13px;
+                    ">
+                        <span class="blink">_</span>
+                    </div>
                 </div>
             </div>
+
             <style>
-                @keyframes spin {
-                    to {
-                        transform: rotate(360deg);
+                .term-time {
+                    color: #555;
+                    margin-right: 8px;
+                }
+
+                .term-line {
+                    margin-bottom: 6px;
+                }
+
+                .blink {
+                    animation: blinking 1s infinite;
+                }
+
+                @keyframes blinking {
+                    0% {
+                        opacity: 0;
+                    }
+
+                    50% {
+                        opacity: 1;
+                    }
+
+                    100% {
+                        opacity: 0;
                     }
                 }
             </style>
         </section>
 
-        <section id="roadmap">
-            <div class="container">
-                <div class="section-head">
-                    <h2>Roadmap</h2>
-                    <div class="muted">Execution timeline.</div>
-                </div>
-
-                <div class="three">
-                    <div class="card reveal step">
-                        <div class="pill" style="margin-bottom:12px; border-color:var(--purple)">Phase 1 (Current)</div>
-                        <b>Foundation</b>
-                        <p>Contract Development<br>Security Audit<br>Community Building<br>Presale Launch</p>
-                    </div>
-                    <div class="card reveal step">
-                        <div class="pill" style="margin-bottom:12px">Phase 2</div>
-                        <b>Launch</b>
-                        <p>PancakeSwap Listing<br>CoinGecko/CMC Listing<br>First Revenue Distro<br>Marketing Push</p>
-                    </div>
-                    <div class="card reveal step">
-                        <div class="pill" style="margin-bottom:12px">Phase 3</div>
-                        <b>Expansion</b>
-                        <p>Advanced Strategies<br>DAO Governance<br>Cross-chain Bridge<br>Partnerships</p>
-                    </div>
-                </div>
+        <!-- Script -->
+        <script src="agent-terminal.js"></script>
+        <div class="container">
+            <div class="section-head">
+                <h2>Roadmap</h2>
+                <div class="muted">Execution timeline.</div>
             </div>
 
-            <!-- Abstract Background Element Removed -->
+            <div class="three">
+                <div class="card reveal step">
+                    <div class="pill" style="margin-bottom:12px; border-color:var(--purple)">Phase 1 (Current)</div>
+                    <b>Foundation</b>
+                    <p>Contract Development<br>Security Audit<br>Community Building<br>Presale Launch</p>
+                </div>
+                <div class="card reveal step">
+                    <div class="pill" style="margin-bottom:12px">Phase 2</div>
+                    <b>Launch</b>
+                    <p>PancakeSwap Listing<br>CoinGecko/CMC Listing<br>First Revenue Distro<br>Marketing Push</p>
+                </div>
+                <div class="card reveal step">
+                    <div class="pill" style="margin-bottom:12px">Phase 3</div>
+                    <b>Expansion</b>
+                    <p>Advanced Strategies<br>DAO Governance<br>Cross-chain Bridge<br>Partnerships</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Abstract Background Element Removed -->
         </section>
 
         <section id="risk">

@@ -32,8 +32,9 @@ const CONFIG = {
         blockExplorer: "https://bscscan.com"
     },
     TESTNET: {
-        contractAddress: "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318", // Keep local for now or update
-        usdtAddress: "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+        contractAddress: "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9", // Local Hardhat Deployment
+        usdtAddress: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512", // Local MockUSDT
+        tokenAddress: "0x5FbDB2315678afecb367f032d93F642f64180aa3", // Local Token Address
         chainId: 1337, // Defaulting to Local for now to keep it working
         chainHex: "0x539",
         rpcUrl: "http://127.0.0.1:8545/",
@@ -563,6 +564,39 @@ async function generateAIImage() {
         aiPlaceholder.textContent = "Error: GPU Node busy. Please try again.";
         generateBtn.disabled = false;
         generateBtn.innerHTML = "<span>✨ Generate</span>";
+    }
+}
+
+
+// Add Token to Wallet
+async function addTokenToWallet() {
+    const tokenAddress = WEB3_CONFIG.tokenAddress;
+    const tokenSymbol = 'NUERALLY';
+    const tokenDecimals = 18;
+    const tokenImage = window.location.origin + '/assets/hero-brain.png';
+
+    try {
+        const wasAdded = await window.ethereum.request({
+            method: 'wallet_watchAsset',
+            params: {
+                type: 'ERC20',
+                options: {
+                    address: tokenAddress,
+                    symbol: tokenSymbol,
+                    decimals: tokenDecimals,
+                    image: tokenImage,
+                },
+            },
+        });
+
+        if (wasAdded) {
+            console.log('Token added!');
+        } else {
+            console.log('Token add rejected');
+        }
+    } catch (error) {
+        console.log(error);
+        alert("Failed to add token: " + (error.message || error));
     }
 }
 
